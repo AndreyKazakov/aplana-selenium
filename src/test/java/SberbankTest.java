@@ -1,3 +1,4 @@
+import com.sun.scenario.effect.impl.sw.sse.SSEBlend_SRC_OUTPeer;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -23,51 +24,64 @@ public class SberbankTest {
 
         driver = new ChromeDriver();
         url = "http://www.sberbank.ru/ru/person";
-        driver.manage().timeouts().implicitlyWait(60, TimeUnit.SECONDS);
+        driver.manage().timeouts().implicitlyWait(40, TimeUnit.SECONDS);
         driver.manage().window().maximize();
     }
 
     @Test
     public void SberTest1() {
+
+        // Переход на страницу http://www.sberbank.ru/ru/person и нажатие на Страхование
         driver.get(url);
         driver.findElement(By.xpath("//div[@role='navigation']//span[text()='Страхование']")).click();
 
+        // Дожидаемся, что "Путешествие и покупки" появилось и затем нажимаем на него.
         WebElement btnTripsAndPurchasesMenuItem = driver.findElement(By.xpath("//div[contains(@id,'submenu')]//ul//li//a[text()='Путешествия и покупки']"));
-        Wait<WebDriver> wait = new WebDriverWait(driver, 20);
+        Wait<WebDriver> wait = new WebDriverWait(driver, 40);
         wait.until(ExpectedConditions.visibilityOf(btnTripsAndPurchasesMenuItem));
         btnTripsAndPurchasesMenuItem.click();
 
+        // Дожидаемся заголовка "Страхование путешественников"
         WebElement textTripsAndPurchasesTitle = driver.findElement(By.xpath("//h3[text()='Страхование путешественников']"));
         wait.until(ExpectedConditions.visibilityOf(textTripsAndPurchasesTitle));
 
-        String initialWindow = driver.getWindowHandle();
+        // Запоминаем хендлы всех окон до того, как откроется новое окно
         ArrayList<String> windowsHandlesBeforeClick = new ArrayList<String>(driver.getWindowHandles());
 
-
+        // Находим кнопку "Оформить Онлайн" именну ту, которая лежит рядом с заголовком "Страхование путешественников" и кликаем в нее
         WebElement btnOrderOnline = driver.findElement(By.xpath("//h3[text()='Страхование путешественников']/ancestor::div[contains(@class,'sbrf-div-list-inner')][1]/following-sibling::div//a[text()='Оформить онлайн']"));
         btnOrderOnline.click();
 
+        //Дожидаемся, что количество окон стало на один больше
         wait.until(ExpectedConditions.numberOfWindowsToBe(windowsHandlesBeforeClick.size()+1));
 
+        // Находим хендл нового открывшегося окна и переключаемся к нему
         ArrayList<String> windowsHandlesAfterClick = new ArrayList<String>(driver.getWindowHandles());
         windowsHandlesAfterClick.removeAll(windowsHandlesBeforeClick);
         String newWindow = windowsHandlesAfterClick.get(0);
-
         driver.switchTo().window(newWindow);
 
+        //Дожидаемся появления заголовка "Выбор полиса"
         wait.until(ExpectedConditions.visibilityOf(driver.findElement(By.xpath("//span[text()='Выбор полиса']"))));
 
+        //Выбираем сумму страховой защиты – "Минимальная"
         WebElement textMinSum = driver.findElement(By.xpath("//*[text()='Выберите сумму страховой защиты']/following-sibling::div//div[text()='Минимальная']"));
         textMinSum.click();
 
+        //Перемещаемся к кнопке "Оформить" и нажимаем ее
         WebElement btnOrder = driver.findElement(By.xpath("//span[contains(@ng-click,'save') and text()='Оформить']"));
+        moveToElementByJS(btnOrder);
         btnOrder.click();
 
-
+        //Дожидаемся появления поля Фамилия застрахованного, как свидельство того, что мы видим вкладку "Оформить"
+        //Определяем элементы и заполняем их:
+        //Фамилию и Имя, Дату рождения застрахованных
+        //Данные страхователя: Фамилия, Имя, Отчество, Дата рождения, Пол
+        //Паспортные данные
         WebElement inputInsuredSurname = driver.findElement(By.xpath("//input[@name='insured0_surname']"));
+        wait.until(ExpectedConditions.visibilityOf(inputInsuredSurname));
         WebElement inputInsuredName = driver.findElement(By.xpath("//input[@name='insured0_name']"));
         WebElement inputInsuredBirthDate = driver.findElement(By.xpath("//input[@name='insured0_birthDate']"));
-        wait.until(ExpectedConditions.visibilityOf(inputInsuredSurname));
 
         WebElement inputSurname = driver.findElement(By.xpath("//input[@name='surname']"));
         WebElement inputName = driver.findElement(By.xpath("//input[@name='name']"));
@@ -75,40 +89,47 @@ public class SberbankTest {
         WebElement inputBirthDate = driver.findElement(By.xpath("//input[@name='birthDate']"));
         WebElement btnFemale = driver.findElement(By.xpath("//input[@type='radio' and @name='female']"));
 
-        fillTextField(inputInsuredSurname, "Petrov");
-        fillTextField(inputInsuredName, "Ivan");
-        fillFieldByJS(inputInsuredBirthDate, "10.10.1980");
-        fillTextField(inputSurname, "Смирнова");
-        fillTextField(inputName, "Елена");
-        fillTextField(inputMiddlename, "Борисовна");
-        fillFieldByJS(inputBirthDate, "08.11.1982");
-        btnFemale.click();
-
         WebElement inputPassportSeries = driver.findElement(By.xpath("//input[@name='passport_series']"));
         WebElement inputPassportNumber = driver.findElement(By.xpath("//input[@name='passport_number']"));
         WebElement inputIssueDate = driver.findElement(By.xpath("//input[@name='issueDate']"));
         WebElement textAreaIssuePlace = driver.findElement(By.xpath("//textarea[@name='issuePlace']"));
 
+        fillTextField(inputInsuredSurname, "Petrov");
+        fillTextField(inputInsuredName, "Ivan");
+        fillFieldByJS(inputInsuredBirthDate, "05.11.1993");
+        fillTextField(inputSurname, "Смирнова");
+        fillTextField(inputName, "Елена");
+        fillTextField(inputMiddlename, "Борисовна");
+        fillFieldByJS(inputBirthDate, "05.05.1997");
+        btnFemale.click();
         fillTextField(inputPassportSeries, "1234");
         fillTextField(inputPassportNumber, "567890");
-        fillFieldByJS(inputIssueDate, "05.06.2004");
+        fillFieldByJS(inputIssueDate, "26.05.2017");
         fillTextField(textAreaIssuePlace, "ОВД Центрального р-на");
 
-        //проверка правильности ввода всех значений
 
+        //Проверяем, что все поля заполнены правильно
+        Assert.assertEquals("Фамилия застрахованного введена некорректно","Petrov", inputInsuredSurname.getAttribute("value"));
+        Assert.assertEquals("Имя застрахованного введено некорректно", "Ivan", inputInsuredName.getAttribute("value"));
+        Assert.assertEquals("Дата рождения застрахованного введена некорректно", "05.11.1993", inputInsuredBirthDate.getAttribute("value"));
+        Assert.assertEquals("Фамилия страхователя введена некорректно", "Смирнова", inputSurname.getAttribute("value"));
+        Assert.assertEquals("Имя страхователя введено некорректно","Елена", inputName.getAttribute("value"));
+        Assert.assertEquals("Отчество страхователя введено некорректно","Борисовна", inputMiddlename.getAttribute("value"));
+        Assert.assertEquals("Дата рождения страхователя введена некорректно","05.05.1997", inputBirthDate.getAttribute("value"));
+        Assert.assertTrue("Пол страхователя введен некорректно", btnFemale.isSelected());
+        Assert.assertEquals("Серия паспорта введена некорректно","1234", inputPassportSeries.getAttribute("value"));
+        Assert.assertEquals("Номер паспорта введен некорректно","567890", inputPassportNumber.getAttribute("value"));
+        Assert.assertEquals("Дата выдачи паспорта введена некорректно","26.05.2017", inputIssueDate.getAttribute("value"));
+        Assert.assertEquals("Кем выдан введено некорректно","ОВД Центрального р-на", textAreaIssuePlace.getAttribute("value"));
 
-        //нажатие Продолжить
+        //Нажимаем Продолжить
         WebElement btnContinue = driver.findElement(By.xpath("//span[text()='Продолжить']"));
+        moveToElementByJS(btnContinue);
+        btnContinue.click();
 
-
-
-
-
-        try {
-            Thread.sleep(10000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        //Проверяем, что появилось сообщение - Заполнены не все обязательные поля
+        WebElement textErrorMessage = driver.findElement(By.xpath("//div[text()='Заполнены не все обязательные поля']"));
+        Assert.assertTrue(textErrorMessage.isDisplayed());
 
     }
 
@@ -117,29 +138,22 @@ public class SberbankTest {
         driver.quit();
     }
 
+    //метод заполнения тектовых полей с предварительной очисткой
     private void fillTextField(WebElement element, String value){
         element.clear();
         element.sendKeys(value);
     }
 
+    //метод подкрутки к элементу с помощью JS
     private void moveToElementByJS(WebElement element){
         ((JavascriptExecutor) driver).executeScript("return arguments[0].scrollIntoView(true);", element);
     }
 
+    //метод очистки и заполнения поля с помощью JS
     private void fillFieldByJS(WebElement element, String value){
-        //((JavascriptExecutor) driver).executeScript("arguments[0].click()", element);
-        ((JavascriptExecutor) driver).executeScript("arguments[0].value=''", element);
-        ((JavascriptExecutor) driver).executeScript("arguments[0].value=\'"+value+"\'", element);
-
-//        for (int i=0; i<value.length(); i++) {
-//            element.sendKeys(String.valueOf(value.charAt(i)));
-//            try {
-//                Thread.sleep(200);
-//            } catch (InterruptedException e) {
-//                e.printStackTrace();
-//            }
-//        }
-        //element.sendKeys(Keys.ENTER);
+        JavascriptExecutor js = (JavascriptExecutor) driver;
+        js.executeScript("arguments[0].value=''", element);
+        js.executeScript("arguments[0].value=\'"+value+"\'", element);
     }
 
 }
