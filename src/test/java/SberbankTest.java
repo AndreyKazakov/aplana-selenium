@@ -1,18 +1,19 @@
-import com.sun.scenario.effect.impl.sw.sse.SSEBlend_SRC_OUTPeer;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.openqa.selenium.*;
+import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.support.ui.ExpectedCondition;
+import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Wait;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.Condition;
 
 public class SberbankTest {
     private WebDriver driver;
@@ -21,6 +22,7 @@ public class SberbankTest {
     @Before
     public void setUp() throws Exception {
         System.setProperty("webdriver.chrome.driver", "drivers/chromedriver.exe");
+        System.setProperty("webdriver.gecko.driver", "drivers/geckodriver.exe");
 
         driver = new ChromeDriver();
         url = "http://www.sberbank.ru/ru/person";
@@ -31,24 +33,24 @@ public class SberbankTest {
     @Test
     public void SberTest1() {
 
-        // Переход на страницу http://www.sberbank.ru/ru/person и нажатие на Страхование
+        //Переход на страницу http://www.sberbank.ru/ru/person и нажатие на Страхование
         driver.get(url);
         driver.findElement(By.xpath("//div[@role='navigation']//span[text()='Страхование']")).click();
 
-        // Дожидаемся, что "Путешествие и покупки" появилось и затем нажимаем на него.
+        //Дожидаемся, что "Путешествие и покупки" появилось и затем нажимаем на него.
         WebElement btnTripsAndPurchasesMenuItem = driver.findElement(By.xpath("//div[contains(@id,'submenu')]//ul//li//a[text()='Путешествия и покупки']"));
         Wait<WebDriver> wait = new WebDriverWait(driver, 40);
         wait.until(ExpectedConditions.visibilityOf(btnTripsAndPurchasesMenuItem));
         btnTripsAndPurchasesMenuItem.click();
 
-        // Дожидаемся заголовка "Страхование путешественников"
+        //Дожидаемся заголовка "Страхование путешественников"
         WebElement textTripsAndPurchasesTitle = driver.findElement(By.xpath("//h3[text()='Страхование путешественников']"));
         wait.until(ExpectedConditions.visibilityOf(textTripsAndPurchasesTitle));
 
-        // Запоминаем хендлы всех окон до того, как откроется новое окно
+        //Запоминаем хендлы всех окон до того, как откроется новое окно
         ArrayList<String> windowsHandlesBeforeClick = new ArrayList<String>(driver.getWindowHandles());
 
-        // Находим кнопку "Оформить Онлайн" именну ту, которая лежит рядом с заголовком "Страхование путешественников" и кликаем в нее
+        //Находим кнопку "Оформить Онлайн" именну ту, которая лежит рядом с заголовком "Страхование путешественников" и кликаем в нее
         WebElement btnOrderOnline = driver.findElement(By.xpath("//h3[text()='Страхование путешественников']/ancestor::div[contains(@class,'sbrf-div-list-inner')][1]/following-sibling::div//a[text()='Оформить онлайн']"));
         btnOrderOnline.click();
 
@@ -96,15 +98,15 @@ public class SberbankTest {
 
         fillTextField(inputInsuredSurname, "Petrov");
         fillTextField(inputInsuredName, "Ivan");
-        fillFieldByJS(inputInsuredBirthDate, "05.11.1993");
+        fillTextField(inputInsuredBirthDate, "05.11.1993");
         fillTextField(inputSurname, "Смирнова");
         fillTextField(inputName, "Елена");
         fillTextField(inputMiddlename, "Борисовна");
-        fillFieldByJS(inputBirthDate, "05.05.1997");
+        fillTextField(inputBirthDate, "05.05.1997");
         btnFemale.click();
         fillTextField(inputPassportSeries, "1234");
         fillTextField(inputPassportNumber, "567890");
-        fillFieldByJS(inputIssueDate, "26.05.2017");
+        fillTextField(inputIssueDate, "26.05.2017");
         fillTextField(textAreaIssuePlace, "ОВД Центрального р-на");
 
 
@@ -129,8 +131,8 @@ public class SberbankTest {
 
         //Проверяем, что появилось сообщение - Заполнены не все обязательные поля
         WebElement textErrorMessage = driver.findElement(By.xpath("//div[text()='Заполнены не все обязательные поля']"));
-        Assert.assertTrue(textErrorMessage.isDisplayed());
-
+        wait.until(ExpectedConditions.visibilityOf(textErrorMessage));
+        Assert.assertEquals("Заполнены не все обязательные поля", textErrorMessage.getText());
     }
 
     @After
@@ -147,13 +149,6 @@ public class SberbankTest {
     //метод подкрутки к элементу с помощью JS
     private void moveToElementByJS(WebElement element){
         ((JavascriptExecutor) driver).executeScript("return arguments[0].scrollIntoView(true);", element);
-    }
-
-    //метод очистки и заполнения поля с помощью JS
-    private void fillFieldByJS(WebElement element, String value){
-        JavascriptExecutor js = (JavascriptExecutor) driver;
-        js.executeScript("arguments[0].value=''", element);
-        js.executeScript("arguments[0].value=\'"+value+"\'", element);
     }
 
 }
