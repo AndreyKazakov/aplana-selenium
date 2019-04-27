@@ -12,6 +12,7 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Wait;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
@@ -130,9 +131,7 @@ public class SberbankTest {
         btnContinue.click();
 
         //Проверяем, что появилось сообщение - Заполнены не все обязательные поля
-        WebElement textErrorMessage = driver.findElement(By.xpath("//div[text()='Заполнены не все обязательные поля']"));
-        wait.until(ExpectedConditions.visibilityOf(textErrorMessage));
-        Assert.assertEquals("Заполнены не все обязательные поля", textErrorMessage.getText());
+        Assert.assertTrue("Отсутствует сообщение: Заполнены не все обязательные поля", isElementPresent(By.xpath("//div[text()='Заполнены не все обязательные поля']")));
     }
 
     @After
@@ -150,5 +149,17 @@ public class SberbankTest {
     private void moveToElementByJS(WebElement element){
         ((JavascriptExecutor) driver).executeScript("return arguments[0].scrollIntoView(true);", element);
     }
+
+    private boolean isElementPresent(By locator){
+        try{
+            driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
+            return driver.findElement(locator).isDisplayed();
+        }catch (Exception e){
+            return false;
+        }finally {
+            driver.manage().timeouts().implicitlyWait(40, TimeUnit.SECONDS);
+        }
+    }
+
 
 }
