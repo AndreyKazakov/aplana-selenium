@@ -1,41 +1,24 @@
-import org.junit.After;
 import org.junit.Assert;
-import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Wait;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-import java.time.Duration;
 import java.util.ArrayList;
-import java.util.concurrent.TimeUnit;
 
-public class SberbankTest {
-    private WebDriver driver;
-    private String url;
+public class SberbankTest extends BaseTest {
 
-    @Before
-    public void setUp() throws Exception {
-        System.setProperty("webdriver.chrome.driver", "drivers/chromedriver.exe");
-        System.setProperty("webdriver.gecko.driver", "drivers/geckodriver.exe");
-
-        driver = new ChromeDriver();
-        url = "http://www.sberbank.ru/ru/person";
-        driver.manage().timeouts().implicitlyWait(40, TimeUnit.SECONDS);
-        driver.manage().window().maximize();
-    }
 
     @Test
-    public void SberTest1() {
+    @Ignore
+    public void SberTest() {
 
         //Переход на страницу http://www.sberbank.ru/ru/person и нажатие на Страхование
-        driver.get(url);
+        driver.get(baseUrl);
         driver.findElement(By.xpath("//div[@role='navigation']//span[text()='Страхование']")).click();
 
         //Дожидаемся, что "Путешествие и покупки" появилось и затем нажимаем на него.
@@ -133,33 +116,5 @@ public class SberbankTest {
         //Проверяем, что появилось сообщение - Заполнены не все обязательные поля
         Assert.assertTrue("Отсутствует сообщение: Заполнены не все обязательные поля", isElementPresent(By.xpath("//div[text()='Заполнены не все обязательные поля']")));
     }
-
-    @After
-    public void tearDown() throws Exception {
-        driver.quit();
-    }
-
-    //метод заполнения тектовых полей с предварительной очисткой
-    private void fillTextField(WebElement element, String value){
-        element.clear();
-        element.sendKeys(value);
-    }
-
-    //метод подкрутки к элементу с помощью JS
-    private void moveToElementByJS(WebElement element){
-        ((JavascriptExecutor) driver).executeScript("return arguments[0].scrollIntoView(true);", element);
-    }
-
-    private boolean isElementPresent(By locator){
-        try{
-            driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
-            return driver.findElement(locator).isDisplayed();
-        }catch (Exception e){
-            return false;
-        }finally {
-            driver.manage().timeouts().implicitlyWait(40, TimeUnit.SECONDS);
-        }
-    }
-
 
 }
