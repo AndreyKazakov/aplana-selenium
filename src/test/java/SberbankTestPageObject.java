@@ -10,9 +10,8 @@ public class SberbankTestPageObject extends BaseTest {
         driver.get(baseUrl);
 
         MainPage mainPage = new MainPage(driver);
-        mainPage.selectFromMainMenu("Страхование");
-        mainPage.selectFromMainMenu("Страхование");
-        mainPage.selectFromInsuranceSubMenu("Путешествия и покупки");
+        mainPage.moveMouseOverMainMenu(driver, "Страхование");
+        mainPage.selectFromSubMenu("Путешествия и покупки");
 
         try {
             Thread.sleep(5000);

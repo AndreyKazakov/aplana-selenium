@@ -15,6 +15,10 @@ public class BaseTest {
     protected static String baseUrl;
     public static Properties properties = TestProperties.getInstance().getProperties();
 
+    public static WebDriver getDriver() {
+        return driver;
+    }
+
     @BeforeClass
     public static void setUp() throws Exception {
 
