@@ -1,12 +1,15 @@
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
-import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
+import java.time.Duration;
+import java.util.ArrayList;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
@@ -14,10 +17,6 @@ public class BaseTest {
     protected static WebDriver driver;
     protected static String baseUrl;
     public static Properties properties = TestProperties.getInstance().getProperties();
-
-    public static WebDriver getDriver() {
-        return driver;
-    }
 
     @BeforeClass
     public static void setUp() throws Exception {
@@ -46,27 +45,23 @@ public class BaseTest {
         driver.quit();
     }
 
-    //метод заполнения тектовых полей с предварительной очисткой
-    protected void fillTextField(WebElement element, String value){
-        element.clear();
-        element.sendKeys(value);
-    }
-
     //метод подкрутки к элементу с помощью JS
     protected void moveToElementByJS(WebElement element){
         ((JavascriptExecutor) driver).executeScript("return arguments[0].scrollIntoView(true);", element);
     }
 
-    //метод проверки отображения элемента на странице
-    protected boolean isElementPresent(By locator){
-        try{
-            driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
-            return driver.findElement(locator).isDisplayed();
-        }catch (Exception e){
-            return false;
-        }finally {
-            driver.manage().timeouts().implicitlyWait(Integer.parseInt(properties.getProperty("defaultTimeout")), TimeUnit.SECONDS);
-        }
+    // метод переключения к только что открытому (открытому последним) окну.
+    // В качестве параметра надо передать список хендлов окон, которые были открыты до открытия последнего окна.
+    protected void switchToJustOpenedWindow(ArrayList<String> windowsHandlesBeforeClick) {
+        WebDriverWait wait = new WebDriverWait(driver, 15);
+        wait.withMessage("Количество окон не изменилось");
+        wait.pollingEvery(Duration.ofSeconds(1));
+        wait.until(ExpectedConditions.numberOfWindowsToBe(windowsHandlesBeforeClick.size() + 1));
+
+        ArrayList<String> windowsHandlesAfterClick = new ArrayList<String>(driver.getWindowHandles());
+        windowsHandlesAfterClick.removeAll(windowsHandlesBeforeClick);
+        String newWindow = windowsHandlesAfterClick.get(0);
+        driver.switchTo().window(newWindow);
     }
 
 }
