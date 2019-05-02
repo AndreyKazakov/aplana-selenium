@@ -1,10 +1,10 @@
 package pages;
 
 import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
+import steps.BaseSteps;
 
 
 public class MainPage extends BasePage {
@@ -15,9 +15,8 @@ public class MainPage extends BasePage {
     @FindBy(xpath = "//span[text()='Страхование' and contains(@class,'lg-menu')]/ancestor::button[contains(@class,'lg-menu')]/following-sibling::div")
     WebElement insuranceSubMenu;
 
-    public MainPage(WebDriver driver) {
-        PageFactory.initElements(driver, this);
-        this.driver = driver;
+    public MainPage() {
+        PageFactory.initElements(BaseSteps.getDriver(), this);
     }
 
     public void selectFromTopMenu(String menuItem){

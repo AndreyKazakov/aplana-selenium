@@ -9,6 +9,8 @@ import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Wait;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import steps.BaseSteps;
+import util.TestProperties;
 
 public class TravellersInsuranceOrder extends BasePage {
 
@@ -52,10 +54,9 @@ public class TravellersInsuranceOrder extends BasePage {
     public WebElement btnContinue;
 
 
-    public TravellersInsuranceOrder(WebDriver driver) {
-        PageFactory.initElements(driver, this);
-        this.driver = driver;
-        Wait<WebDriver> wait = new WebDriverWait(driver, 20);
+    public TravellersInsuranceOrder() {
+        PageFactory.initElements(BaseSteps.getDriver(), this);
+        Wait<WebDriver> wait = new WebDriverWait(BaseSteps.getDriver(), Integer.parseInt(TestProperties.getInstance().getProperties().getProperty("defaultTimeout")));
         wait.until(ExpectedConditions.visibilityOf(inputInsuredSurname));
     }
 
@@ -98,42 +99,32 @@ public class TravellersInsuranceOrder extends BasePage {
         }
     }
 
-    public void checkFieldValue(String fieldName, String value) {
-        switch (fieldName) {
+    public String getTextFieldValue(String fieldName) {
+        switch(fieldName) {
             case "Фамилия застрахованного":
-                checkFieldValue(inputInsuredSurname, value);
-                break;
+               return inputInsuredSurname.getAttribute("value");
             case "Имя застрахованного":
-                checkFieldValue(inputInsuredName, value);
-                break;
+                return inputInsuredName.getAttribute("value");
             case "Дата рождения застрахованного":
-                checkFieldValue(inputInsuredBirthDate, value);
-                break;
+                return inputInsuredBirthDate.getAttribute("value");
             case "Фамилия":
-                checkFieldValue(inputSurname, value);
-                break;
+                return inputSurname.getAttribute("value");
             case "Имя":
-                checkFieldValue(inputName, value);
-                break;
+                return inputName.getAttribute("value");
             case "Отчество":
-                checkFieldValue(inputMiddlename, value);
-                break;
+                return inputMiddlename.getAttribute("value");
             case "Дата рождения":
-                checkFieldValue(inputBirthDate, value);
-                break;
+                return inputBirthDate.getAttribute("value");
             case "Серия паспорта":
-                checkFieldValue(inputPassportSeries, value);
-                break;
+                return inputPassportSeries.getAttribute("value");
             case "Номер паспорта":
-                checkFieldValue(inputPassportNumber, value);
-                break;
+                return inputPassportNumber.getAttribute("value");
             case "Дата выдачи":
-                checkFieldValue(inputIssueDate, value);
-                break;
+                return inputIssueDate.getAttribute("value");
             case "Кем выдан":
-                checkFieldValue(textAreaIssuePlace, value);
-                break;
-            default: throw new AssertionError("Поле '"+fieldName+"' не объявлено на странице");
+                return textAreaIssuePlace.getAttribute("value");
+            default:
+                throw new AssertionError("Поле '"+fieldName+"' не объявлено на странице");
         }
     }
 

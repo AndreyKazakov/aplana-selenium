@@ -7,6 +7,8 @@ import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Wait;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import steps.BaseSteps;
+import util.TestProperties;
 
 public class TravellersInsurancePolicySelection extends BasePage {
 
@@ -19,10 +21,9 @@ public class TravellersInsurancePolicySelection extends BasePage {
     @FindBy(xpath = "//span[contains(@ng-click,'save') and text()='Оформить']")
     public WebElement btnOrder;
 
-    public TravellersInsurancePolicySelection(WebDriver driver) {
-        PageFactory.initElements(driver, this);
-        this.driver = driver;
-        Wait<WebDriver> wait = new WebDriverWait(driver, 20);
+    public TravellersInsurancePolicySelection() {
+        PageFactory.initElements(BaseSteps.getDriver(), this);
+        Wait<WebDriver> wait = new WebDriverWait(BaseSteps.getDriver(), Integer.parseInt(TestProperties.getInstance().getProperties().getProperty("defaultTimeout")));
         wait.until(ExpectedConditions.visibilityOf(textFirstTabHeader));
     }
 }
