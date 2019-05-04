@@ -3,7 +3,7 @@ package steps;
 import pages.MainPage;
 import ru.yandex.qatools.allure.annotations.Step;
 
-public class MainSteps extends BaseSteps {
+public class MainSteps {
 
     @Step("выбран пункт верхнего меню: {0}")
     public void stepSelectTopMenuItem(String menuItem){

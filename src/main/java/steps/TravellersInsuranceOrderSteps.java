@@ -6,7 +6,7 @@ import ru.yandex.qatools.allure.annotations.Step;
 
 import java.util.HashMap;
 
-public class TravellersInsuranceOrderSteps extends BaseSteps {
+public class TravellersInsuranceOrderSteps {
 
     @Step("поле {0} заполняется значением {1}")
     public void stepFillTextField(String fieldName, String value) {
@@ -41,14 +41,14 @@ public class TravellersInsuranceOrderSteps extends BaseSteps {
     }
 
     @Step("на странице отображается сообщение об ошибке {0}")
-    public void checkErrorMessageDisplaying(String errorMessage) {
+    public void stepCheckErrorMessageDisplaying(String errorMessage) {
         new TravellersInsuranceOrder().checkVisibilityOfErrorMessage(errorMessage);
     }
 
     @Step("выполнено нажатие на кнопку - Продолжить")
     public void stepClickContinueButton(){
         TravellersInsuranceOrder page = new TravellersInsuranceOrder();
-        moveToElementByJS(page.btnContinue);
+        page.moveToElementByJS(page.btnContinue);
         page.btnContinue.click();
     }
 }

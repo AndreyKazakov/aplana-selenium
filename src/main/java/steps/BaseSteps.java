@@ -1,18 +1,17 @@
 package steps;
 
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.openqa.selenium.*;
+
+import cucumber.api.java.After;
+import cucumber.api.java.Before;
+import org.openqa.selenium.OutputType;
+import org.openqa.selenium.TakesScreenshot;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
 import ru.yandex.qatools.allure.annotations.Attachment;
 import ru.yandex.qatools.allure.annotations.Step;
 import util.TestProperties;
 
-import java.time.Duration;
-import java.util.ArrayList;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
@@ -25,7 +24,7 @@ public class BaseSteps {
         return driver;
     }
 
-    @BeforeClass
+    @Before
     public static void setUp() throws Exception {
 
         switch (properties.getProperty("browser")) {
@@ -47,7 +46,7 @@ public class BaseSteps {
         driver.manage().window().maximize();
     }
 
-    @AfterClass
+    @After
     public static void tearDown() throws Exception {
         driver.quit();
     }
@@ -65,29 +64,6 @@ public class BaseSteps {
     @Step("выполнен переход на главную страницу")
     public void stepGoToMainPage() {
         driver.get(baseUrl);
-    }
-
-    //метод подкрутки к элементу с помощью JS
-    protected void moveToElementByJS(WebElement element){
-        ((JavascriptExecutor) driver).executeScript("return arguments[0].scrollIntoView(true);", element);
-    }
-
-    // метод переключения к только что открытому (открытому последним) окну.
-    // В качестве параметра надо передать список хендлов окон, которые были открыты до открытия последнего окна.
-    protected void switchToJustOpenedWindow(ArrayList<String> windowsHandlesBeforeClick) {
-        WebDriverWait wait = new WebDriverWait(driver, Integer.parseInt(TestProperties.getInstance().getProperties().getProperty("defaultTimeout")));
-        wait.withMessage("Количество окон не изменилось");
-        wait.pollingEvery(Duration.ofSeconds(1));
-        wait.until(ExpectedConditions.numberOfWindowsToBe(windowsHandlesBeforeClick.size() + 1));
-
-        try {
-            ArrayList<String> windowsHandlesAfterClick = new ArrayList<String>(driver.getWindowHandles());
-            windowsHandlesAfterClick.removeAll(windowsHandlesBeforeClick);
-            String newWindow = windowsHandlesAfterClick.get(0);
-            driver.switchTo().window(newWindow);
-        }catch (IndexOutOfBoundsException e) {
-            throw new AssertionError("Новое окно не обнаружено");
-        }
     }
 
 }
